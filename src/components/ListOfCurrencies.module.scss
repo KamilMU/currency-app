@@ -1,0 +1,50 @@
+ul {
+  display: flex;
+  flex-direction: column;
+
+  .currency {
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 14px;
+    padding: 16px;
+
+    &:hover {
+      box-shadow:0 0 10px #000;
+    }
+
+    &__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__rowLeft {
+      display: flex;
+    }
+
+    &__rowRight {
+
+      .green {
+        color: rgb(141, 241, 141);
+        
+        &::before {
+          content: "\2191";
+        }
+      }
+    
+      .red {
+        color: rgb(248, 106, 106);
+    
+        &::before {
+          content: "\2193";
+        }
+      }
+    }
+
+    &__name {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 8px;
+    }
+  }
+}

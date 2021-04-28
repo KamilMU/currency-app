@@ -1,0 +1,22 @@
+.app {
+  text-align: center;
+  width: 60%;
+  margin: 0 auto;
+  padding-top: 10px;
+
+  .tabs {
+    margin-bottom: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    a {
+      color: white;
+
+      &:hover {
+        color: black;
+      }
+    }
+  }
+}
