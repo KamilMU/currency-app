@@ -1,118 +1,86 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 import styles from './CurrencyConverter.module.scss';
+import CurrencyRow from './CurrencyRow.jsx';
 
-function CurrencyConverter({ currencies, currencyName }) {
-  const [firstSelectedCurrency, setFirstSelectedCurrency] = useState('');
-  const [secondSelectedCurrency, setSecondSelectedCurrency] = useState('');
-  const [firstInputValue, setFirstInputValue] = useState('');
-  const [secondInputValue, setSecondInputValue] = useState('');
+function CurrencyConverter({ currencies }) {
+  const [currencyOptions, setCurrencyOptions] = useState([]);
+  const [fromCurrency, setFromCurrency] = useState();
+  const [toCurrency, setToCurrency] = useState();
+  const [exchangeRate, setExchangeRate] = useState();
+  const [amount, setAmount] = useState(1);
+  const [amountInFromCurrency, setAmountInFromCurrency] = useState(true);
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
-  function convertCurrency() {
-    console.log(firstInputValue, 'fff')
-
-    setSecondInputValue(currencies.filter(currency => {
-      return firstInputValue * currency.Value * currency.Nominal
-    }
-    ))
+  let toAmount, fromAmount
+  if (amountInFromCurrency) {
+    fromAmount = amount
+    toAmount = amount * exchangeRate
+  } else {
+    toAmount = amount
+    fromAmount = amount / exchangeRate
   }
 
-  //   if (firstInputValue.length) {
-  //     currencies.filter(currency => {
-  //       setSecondInputValue(firstInputValue * currency.Value * currency.Nominal);
-  //     })
-  //   } else {
+  useEffect(() => {
+    currencies.length && setCurrencyOptions(currencies.map(currency => {
+      return currency.CharCode
+    }))
+    setFromCurrency(currencyOptions[0])
+    setToCurrency(currencyOptions[1])
+    setExchangeRate(currencies.length && currencies[1].Value)
+  }, [currencies, currencyOptions.length])
 
-  //   }
-  // }
+  useEffect(() => {
+    if (fromCurrency != null && toCurrency != null) {
+      setExchangeRate((currencies.length && currencies).filter(currency => {
+        return currency.CharCode === toCurrency || currency.CharCode === fromCurrency
+      }).map(e => e.Value)[0])
+    }
+  }, [fromCurrency, toCurrency])
+
+  function handleFromAmountChange(e) {
+    setAmount(e.target.value)
+    setAmountInFromCurrency(true)
+  }
+
+  function handleToAmountChange(e) {
+    setAmount(e.target.value)
+    setAmountInFromCurrency(false)
+  }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.currencyContainer}>
-        <div>
-          {firstSelectedCurrency ? currencies.map((currency, index) => {
-            if (currency.CharCode === firstSelectedCurrency) {
-              return (<div key={index}>{currency.Name}</div>)
-            }
-          }) : (<div>{currencies.length && currencies[0].Name}</div>)}
-
-        </div>
-        <div className={styles.currencyContainer__bottomRow}>
-          <select
-            onChange={e => setFirstSelectedCurrency(e.target.value)}>
-            {currencies.map((currency, index) => (
-              <option
-                key={index}
-                value={currency.CharCode}>
-                {currency.CharCode}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            value={firstInputValue}
-            onChange={e => {
-
-                setFirstInputValue(e.target.value);
-                console.log(firstInputValue, 'fff')
-
-
-              if (firstInputValue.length) {
-                currencies.filter(currency => {
-                  console.log(secondInputValue)
-                  setSecondInputValue(firstInputValue * currency.Value * currency.Nominal)
-                })} else if (!firstInputValue.length && secondInputValue.length) {
-                setSecondInputValue(0)
-              }
-
-            }}
-          />
-        </div>
-      </div>
-
-      <button>&#10231;</button>
-
-      <div className={styles.currencyContainer}>
-        <div>
-          {secondSelectedCurrency ? currencies.map((currency, index) => {
-            if (currency.CharCode === secondSelectedCurrency) {
-              return (<div key={index}>{currency.Name}</div>)
-            }
-          }) : (<div>{currencies.length && currencies[0].Name}</div>)}
-
-        </div>
-        <div className={styles.currencyContainer__bottomRow}>
-          <select
-            onChange={e => setSecondSelectedCurrency(e.target.value)}>
-            {currencies.map((currency, index) => (
-              <option
-                key={index}
-                value={currency.CharCode}>
-                {currency.CharCode}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            value={secondInputValue}
-            readOnly
-            onChange={e => {
-              setSecondInputValue(e.target.value)
-            }}
-          />
-        </div>
-      </div>
+    <div
+      style={{ flexDirection: isButtonClicked ? 'row-reverse' : '' }}
+      className={styles.container}>
+      <CurrencyRow
+        currencyOptions={currencyOptions}
+        selectedCurrency={fromCurrency}
+        onChangeCurrency={e => setFromCurrency(e.target.value)}
+        onChangeAmount={handleFromAmountChange}
+        currencies={currencies}
+        isButtonClicked={isButtonClicked}
+        amountInFromCurrency={amountInFromCurrency}
+        amount={fromAmount}
+      />
+      <button
+        className="equals"
+        onClick={() => {
+          setIsButtonClicked(!isButtonClicked);
+        }}>
+        &#10231;
+      </button>
+      <CurrencyRow
+        currencyOptions={currencyOptions}
+        selectedCurrency={toCurrency}
+        onChangeCurrency={e => setToCurrency(e.target.value)}
+        currencies={currencies}
+        isButtonClicked={isButtonClicked}
+        onChangeAmount={handleToAmountChange}
+        amountInFromCurrency={amountInFromCurrency}
+        amount={toAmount}
+      />
     </div>
-  )
+  );
 }
 
-function mapStateToProps(state) {
-  return {
-    currencies: state.currencies.currencies,
-    currencyName: state.currencies.currencies.map((currency, index) => currency.Name),
-    currencyCharCode: state.currencies.currencies.map(currency => currency.CharCode),
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(CurrencyConverter));
+export default withRouter(CurrencyConverter);

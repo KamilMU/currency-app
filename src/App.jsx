@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './App.module.scss';
 import { Route, Switch, Link, withRouter } from 'react-router-dom';
 import Currencies from './components/Currencies.jsx';
@@ -6,7 +6,9 @@ import CurrencyConverter from './components/CurrencyConverter.jsx';
 import { connect } from 'react-redux';
 import { getCurrencies, searchCurrency } from './actions/index';
 
-function App({ currencies, onSearchCurrency, onGetCurrencies }) {
+function App({ currencies, currenciesToConvert, onSearchCurrency, onGetCurrencies }) {
+
+
   useEffect(() => {
     onGetCurrencies();
   }, []);
@@ -35,6 +37,7 @@ function App({ currencies, onSearchCurrency, onGetCurrencies }) {
           path="/converter"
           render={() => (
             <CurrencyConverter
+              currencies={currencies}
             />)}
         />
         <Route
@@ -48,7 +51,7 @@ function App({ currencies, onSearchCurrency, onGetCurrencies }) {
 }
 
 function mapStateToProps(state) {
-  console.log(state.currencies, "state")
+  console.log(state, "state")
   return {
     currencies: state.currencies.currencies
   }
