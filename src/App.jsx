@@ -1,24 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styles from './App.module.scss';
 import { Route, Switch, Link, withRouter } from 'react-router-dom';
 import Currencies from './components/Currencies.jsx';
 import CurrencyConverter from './components/CurrencyConverter.jsx';
-import axios from 'axios';
+import { connect } from 'react-redux';
+import { getCurrencies, searchCurrency } from './actions/index';
 
-function App() {
-  // const [currencies, setCurrencies] = useState([]);
-
-  // useEffect(() => {
-  //   async function getCurrencies() {
-  //     const response = await axios.get('https://www.cbr-xml-daily.ru/daily_json.js');
-
-  //     const data = await Object.values(response.data.Valute);
-  //     console.log(data);
-  //     setCurrencies(data);
-  //   }
-
-  //   getCurrencies()
-  // }, []);
+function App({ currencies, onSearchCurrency, onGetCurrencies }) {
+  useEffect(() => {
+    onGetCurrencies();
+  }, []);
 
   return (
     <div className={styles.app}>
@@ -33,13 +24,19 @@ function App() {
           path="/"
           render={() => (
             <Currencies
+              currencies={currencies}
+              onSearchCurrency={onSearchCurrency}
+              onGetCurrencies={onGetCurrencies}
             />
           )}
         />
         <Route
           exact
           path="/converter"
-          component={CurrencyConverter} />
+          render={() => (
+            <CurrencyConverter
+            />)}
+        />
         <Route
           exact
           path="*"
@@ -50,4 +47,18 @@ function App() {
   );
 }
 
-export default withRouter(App);
+function mapStateToProps(state) {
+  console.log(state.currencies, "state")
+  return {
+    currencies: state.currencies.currencies
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onGetCurrencies: () => dispatch(getCurrencies()),
+    onSearchCurrency: (text) => dispatch(searchCurrency(text))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));
