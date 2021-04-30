@@ -7,11 +7,12 @@ export default function CurrencyRow(props) {
     selectedCurrency,
     onChangeCurrency,
     onChangeAmount,
+    isRight,
     amount,
-    currencies,
-    isButtonClicked
+    currencies
   } = props
 
+  console.log(isRight(), 'rrrr')
   return (
     <div className={styles.currencyContainer}>
       <div className={styles.currencyContainer__name}>
@@ -30,8 +31,8 @@ export default function CurrencyRow(props) {
         <input
           type="number"
           className="input"
-          value={amount}
-          readOnly={isButtonClicked && "readonly"}
+          value={amount ? amount : ''}
+          readOnly={isRight() && "readonly"}
           onChange={onChangeAmount}
         />
         <select value={selectedCurrency} onChange={onChangeCurrency}>

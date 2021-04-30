@@ -27,14 +27,22 @@ function CurrencyConverter({ currencies }) {
     }))
     setFromCurrency(currencyOptions[0])
     setToCurrency(currencyOptions[1])
-    setExchangeRate(currencies.length && currencies[1].Value)
+    setExchangeRate(currencies.length && currencies.filter(cur => cur[fromCurrency]).map(cur => cur.Value).Value)
   }, [currencies, currencyOptions.length])
 
   useEffect(() => {
     if (fromCurrency != null && toCurrency != null) {
-      setExchangeRate((currencies.length && currencies).filter(currency => {
-        return currency.CharCode === toCurrency || currency.CharCode === fromCurrency
-      }).map(e => e.Value)[0])
+      function exchange(currentCurrency) {
+        return (currencies.length && currencies).filter(currency => {
+          return currency.CharCode === currentCurrency
+        }).map(e => e.Value)[0]
+      }
+
+      if (fromCurrency) {
+        setExchangeRate(exchange(fromCurrency))
+      } else {
+        setExchangeRate(exchange(toCurrency))
+      }
     }
   }, [fromCurrency, toCurrency])
 
@@ -58,8 +66,13 @@ function CurrencyConverter({ currencies }) {
         onChangeCurrency={e => setFromCurrency(e.target.value)}
         onChangeAmount={handleFromAmountChange}
         currencies={currencies}
-        isButtonClicked={isButtonClicked}
-        amountInFromCurrency={amountInFromCurrency}
+        isRight={() => {
+          if (!isButtonClicked) {
+            return false
+          } else {
+            return true
+          }
+        }}
         amount={fromAmount}
       />
       <button
@@ -74,9 +87,14 @@ function CurrencyConverter({ currencies }) {
         selectedCurrency={toCurrency}
         onChangeCurrency={e => setToCurrency(e.target.value)}
         currencies={currencies}
-        isButtonClicked={isButtonClicked}
+        isRight={() => {
+          if (!isButtonClicked) {
+            return true
+          } else {
+            return false
+          }
+        }}
         onChangeAmount={handleToAmountChange}
-        amountInFromCurrency={amountInFromCurrency}
         amount={toAmount}
       />
     </div>
