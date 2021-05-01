@@ -1,7 +1,6 @@
 const initialState = {
   currencies: [],
   oldCurrencies: [],
-  currenciesForConvert: {}
 }
 
 export const currenciesReducer = (state = initialState, action) => {
@@ -10,8 +9,7 @@ export const currenciesReducer = (state = initialState, action) => {
       return {
         ...state,
         currencies: [...state.currencies, ...Object.values(action.payload)],
-        oldCurrencies: [...state.oldCurrencies, ...Object.values(action.payload)],
-        currenciesForConvert: {...state.currenciesForConvert, ...action.payload}
+        oldCurrencies: [...state.oldCurrencies, ...Object.values(action.payload)]
       }
 
     case 'SEARCH_CURRENCY':
