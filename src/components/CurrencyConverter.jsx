@@ -4,13 +4,13 @@ import styles from './CurrencyConverter.module.scss';
 import CurrencyRow from './CurrencyRow.jsx';
 
 function CurrencyConverter({ currencies }) {
-  const [currencyOptions, setCurrencyOptions] = useState([]);
   const [fromCurrency, setFromCurrency] = useState();
   const [toCurrency, setToCurrency] = useState();
   const [exchangeRate, setExchangeRate] = useState();
   const [amount, setAmount] = useState(1);
   const [amountInFromCurrency, setAmountInFromCurrency] = useState(true);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [fromCurrencyOptionChanged, setFromCurrencyOptionChanged] = useState(false);
 
   let toAmount, fromAmount
   if (amountInFromCurrency) {
@@ -22,33 +22,30 @@ function CurrencyConverter({ currencies }) {
   }
 
   useEffect(() => {
-    currencies.length && setCurrencyOptions(currencies.map(currency => {
-      return currency.CharCode
-    }))
-    setFromCurrency(currencyOptions[0])
-    setToCurrency(currencyOptions[1])
-    setExchangeRate(currencies.length && currencies.filter(cur => cur[fromCurrency]).map(cur => cur.Value).Value)
-  }, [currencies, currencyOptions.length])
+    setFromCurrency(currencies.map(c => c.CharCode)[0])
+    setToCurrency(currencies.map(c => c.CharCode)[1])
+    setExchangeRate(currencies.length && (
+      currencies[0].Value))
+  }, [currencies])
 
   useEffect(() => {
     if (fromCurrency != null && toCurrency != null) {
-      function exchange(currentCurrency) {
-        return (currencies.length && currencies).filter(currency => {
-          return currency.CharCode === currentCurrency
-        }).map(e => e.Value)[0]
-      }
-
-      if (fromCurrency) {
-        setExchangeRate(exchange(fromCurrency))
-      } else {
-        setExchangeRate(exchange(toCurrency))
-      }
+      setExchangeRate(currencies.length && (
+        (currencies)
+          .filter(currency => {
+            if (fromCurrencyOptionChanged) {
+              return (currency.CharCode === fromCurrency)
+            } else {
+              return (currency.CharCode === toCurrency)
+            }
+          }).map(e => e.Value)[0]))
     }
   }, [fromCurrency, toCurrency])
 
   function handleFromAmountChange(e) {
     setAmount(e.target.value)
     setAmountInFromCurrency(true)
+
   }
 
   function handleToAmountChange(e) {
@@ -58,12 +55,14 @@ function CurrencyConverter({ currencies }) {
 
   return (
     <div
-      style={{ flexDirection: isButtonClicked ? 'row-reverse' : '' }}
+      style={{
+        flexDirection: isButtonClicked ? 'row-reverse' : ''
+      }}
       className={styles.container}>
       <CurrencyRow
-        currencyOptions={currencyOptions}
+        currencyOptions={() => currencies.map(c => c.CharCode)}
         selectedCurrency={fromCurrency}
-        onChangeCurrency={e => setFromCurrency(e.target.value)}
+        onChangeCurrency={e => { setFromCurrency(e.target.value); setFromCurrencyOptionChanged(true) }}
         onChangeAmount={handleFromAmountChange}
         currencies={currencies}
         isRight={() => {
@@ -83,9 +82,9 @@ function CurrencyConverter({ currencies }) {
         &#10231;
       </button>
       <CurrencyRow
-        currencyOptions={currencyOptions}
+        currencyOptions={() => currencies.map(c => c.CharCode)}
         selectedCurrency={toCurrency}
-        onChangeCurrency={e => setToCurrency(e.target.value)}
+        onChangeCurrency={e => { setToCurrency(e.target.value); setFromCurrencyOptionChanged(false) }}
         currencies={currencies}
         isRight={() => {
           if (!isButtonClicked) {

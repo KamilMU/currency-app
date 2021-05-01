@@ -9,10 +9,10 @@ export default function CurrencyRow(props) {
     onChangeAmount,
     isRight,
     amount,
-    currencies
+    currencies,
+    fromCurrencyOptionChanged
   } = props
 
-  console.log(isRight(), 'rrrr')
   return (
     <div className={styles.currencyContainer}>
       <div className={styles.currencyContainer__name}>
@@ -36,7 +36,7 @@ export default function CurrencyRow(props) {
           onChange={onChangeAmount}
         />
         <select value={selectedCurrency} onChange={onChangeCurrency}>
-          {currencyOptions.length && currencyOptions.map((option, index) => (
+          {currencyOptions().length && currencyOptions().map((option, index) => (
             <option key={index} value={option}>{option}</option>
           ))}
         </select>

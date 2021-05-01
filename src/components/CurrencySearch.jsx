@@ -6,6 +6,7 @@ function CurrencySearch({ onSearchCurrency }) {
     <div className={styles.searcContainer}>
       <input
         type="text"
+        placeholder="Поиск валюты"
         autoFocus
         onChange={e => {
           onSearchCurrency(e.target.value);
